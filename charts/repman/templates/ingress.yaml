@@ -1,0 +1,117 @@
+apiVersion: networking.k8s.io/v1beta1
+kind: Ingress
+metadata:
+  name: {{ template "repman.fullname" . }}
+  annotations:
+    {{ toYaml .Values.ingress.annotations }}
+spec:
+  rules:
+    - host: {{ .Values.ingress.web.host }}
+      http:
+        paths:
+          # Base web path
+          - path: /
+            backend:
+              serviceName: {{ template "repman.fullname" . }}-web
+              servicePort: 8000
+          # Composer V1 api
+          - path: /p/
+            backend:
+              serviceName: {{ template "repman.fullname" . }}-api
+              servicePort: 8000
+          # Composer V2 api
+          - path: /p2/
+            backend:
+              serviceName: {{ template "repman.fullname" . }}-api
+              servicePort: 8000
+          # Dists endpoint
+          - path: /dists/
+            backend:
+              serviceName: {{ template "repman.fullname" . }}-api
+              servicePort: 8000
+          # Get all packages from repository
+          - path: /packages.json
+            backend:
+              serviceName: {{ template "repman.fullname" . }}-api
+              servicePort: 8000
+          # Report when packages are downloaded
+          - path: /downloads
+            backend:
+              serviceName: {{ template "repman.fullname" . }}-api
+              servicePort: 8000
+    - host: {{ .Values.ingress.proxy.host }}
+      http:
+        paths:
+          # Base web path
+          - path: /
+            backend:
+              serviceName: {{ template "repman.fullname" . }}-web
+              servicePort: 8000
+          # Composer V1 api
+          - path: /p/
+            backend:
+              serviceName: {{ template "repman.fullname" . }}-api
+              servicePort: 8000
+          # Composer V2 api
+          - path: /p2/
+            backend:
+              serviceName: {{ template "repman.fullname" . }}-api
+              servicePort: 8000
+          # Dists endpoint
+          - path: /dists/
+            backend:
+              serviceName: {{ template "repman.fullname" . }}-api
+              servicePort: 8000
+          # Get all packages from repository
+          - path: /packages.json
+            backend:
+              serviceName: {{ template "repman.fullname" . }}-api
+              servicePort: 8000
+          # Report when packages are downloaded
+          - path: /downloads
+            backend:
+              serviceName: {{ template "repman.fullname" . }}-api
+              servicePort: 8000
+    - host: "{{ .Values.ingress.organization.host }}"
+      http:
+        paths:
+          # Base web path
+          - path: /
+            backend:
+              serviceName: {{ template "repman.fullname" . }}-web
+              servicePort: 8000
+          # Composer V1 api
+          - path: /p/
+            backend:
+              serviceName: {{ template "repman.fullname" . }}-api
+              servicePort: 8000
+          # Composer V2 api
+          - path: /p2/
+            backend:
+              serviceName: {{ template "repman.fullname" . }}-api
+              servicePort: 8000
+          # Dists endpoint
+          - path: /dists/
+            backend:
+              serviceName: {{ template "repman.fullname" . }}-api
+              servicePort: 8000
+          # Get all packages from repository
+          - path: /packages.json
+            backend:
+              serviceName: {{ template "repman.fullname" . }}-api
+              servicePort: 8000
+          # Report when packages are downloaded
+          - path: /downloads
+            backend:
+              serviceName: {{ template "repman.fullname" . }}-api
+              servicePort: 8000
+  tls:
+    - hosts:
+        - {{ .Values.ingress.web.host }}
+      secretName: {{ .Values.ingress.web.secretName }}
+    - hosts:
+        - {{ .Values.ingress.proxy.host }}
+      secretName: {{ .Values.ingress.proxy.secretName }}
+    - hosts:
+        - "{{ .Values.ingress.organization.host }}"
+      secretName: {{ .Values.ingress.organization.secretName }}

@@ -1,0 +1,91 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ template "repman.fullname" . }}-api
+  labels:
+    app: {{ template "repman.name" . }}-api
+spec:
+  replicas: {{ .Values.api.replicas }}
+  selector:
+    matchLabels:
+      app: {{ template "repman.name" . }}-api
+  template:
+    metadata:
+      annotations:
+        checksum/config: {{ include (print $.Template.BasePath "/repman-configmap.yaml") . | sha256sum }}
+        checksum/nginx: {{ include (print $.Template.BasePath "/nginx-configmap.yaml") . | sha256sum }}
+        checksum/php: {{ include (print $.Template.BasePath "/php-ini-configmap.yaml") . | sha256sum }}
+      labels:
+        app: {{ template "repman.name" . }}-api
+    spec:
+      containers:
+        - name: fpm
+          image: "{{ .Values.images.buddy.repository }}:{{ .Values.images.buddy.tag }}"
+          imagePullPolicy: {{ .Values.images.buddy.pullPolicy }}
+          command: ["/bin/bash", "-c", "--"]
+          args:
+            - "cp -r /app/public/* /app/public-shared/ && /app/bin/console d:m:m --no-interaction && /app/bin/console messenger:setup-transports --no-interaction && /app/bin/console assets:install && php-fpm"
+          envFrom:
+            - configMapRef:
+                name: {{ template "repman.fullname" . }}
+          securityContext:
+            runAsUser: 82
+            runAsGroup: 82
+          resources:
+            {{- .Values.api.resources | toYaml | nindent 12 }}
+          volumeMounts:
+            - mountPath: /app/public-shared
+              name: repman-public
+          {{- if .Values.filestorage.persistence.enabled }}
+            - mountPath: {{ .Values.filestorage.path }}
+              name: repman-data
+          {{ end }}
+            - name: {{ template "repman.fullname" . }}-php-ini
+              mountPath: /usr/local/etc/php/conf.d/chart.ini
+              subPath: chart.ini
+              readOnly: true
+        - name: nginx
+          image: "{{ .Values.images.nginx.repository }}:{{ .Values.images.nginx.tag }}"
+          imagePullPolicy: {{ .Values.images.nginx.pullPolicy }}
+          ports:
+            - containerPort: 8000
+          securityContext:
+            runAsUser: 33
+            runAsGroup: 33
+          volumeMounts:
+            - name: nginx-config
+              mountPath: /etc/nginx/sites-available
+              readOnly: true
+            - mountPath: /app/public
+              name: repman-public
+          resources:
+            requests:
+              memory: "256Mi"
+              cpu: "100m"
+      volumes:
+        - name: nginx-config
+          configMap:
+            name: {{ template "repman.fullname" . }}-nginx
+            items:
+              - key: default
+                path: default
+        - name: repman-public
+          emptyDir: {}
+        - name: repman-data
+        {{- if .Values.filestorage.persistence.enabled }}
+        {{- if .Values.filestorage.persistence.existingClaim }}
+          persistentVolumeClaim:
+            claimName: {{ .Values.filestorage.persistence.existingClaim }}
+        {{- else }}
+          persistentVolumeClaim:
+            claimName: {{ template "repman.fullname" . }}-data
+        {{- end }}
+        {{- else }}
+          emptyDir: { }
+        {{ end }}
+        - name: {{ template "repman.fullname" . }}-php-ini
+          configMap:
+            name: {{ template "repman.fullname" . }}-php-ini
+            items:
+              - key: ini
+                path: chart.ini

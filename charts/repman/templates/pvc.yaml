@@ -1,0 +1,25 @@
+{{- if and .Values.filestorage.persistence.enabled (not .Values.filestorage.persistence.existingClaim) -}}
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: {{ template "repman.fullname" . }}-data
+  labels:
+    app: {{ template "repman.name" . }}-web
+spec:
+  accessModes:
+    - {{ .Values.filestorage.persistence.accessMode | quote }}
+  resources:
+    requests:
+      storage: {{ .Values.filestorage.persistence.size | quote }}
+{{- if .Values.filestorage.persistence.storageClass }}
+{{- if (eq "-" .Values.filestorage.persistence.storageClass) }}
+  storageClassName: ""
+{{- else }}
+  storageClassName: "{{ .Values.filestorage.persistence.storageClass }}"
+{{- end }}
+{{- end }}
+{{- if .Values.filestorage.persistence.volumeMode }}
+  volumeMode: {{ .Values.filestorage.persistence.volumeMode }}
+{{- end }}
+{{- end -}}
+

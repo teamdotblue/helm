@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ template "repman.fullname" . }}-instance-id
+data:
+  instance-id:
+    f8a59f98-63c4-42b1-9014-e8e72ad9008d

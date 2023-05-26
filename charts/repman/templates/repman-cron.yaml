@@ -1,0 +1,46 @@
+{{ range $cron, $data := $.Values.crons }}
+apiVersion: {{ include "repman.batch.apiVersion" $ }}
+kind: CronJob
+metadata:
+  name: repman-{{ $cron }}
+spec:
+  schedule: "{{ $data.schedule }}"
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+            - name: job
+              image: "{{ $.Values.images.buddy.repository }}:{{ $.Values.images.buddy.tag }}"
+              imagePullPolicy: {{ $.Values.images.buddy.pullPolicy }}
+              command:
+                {{- range $data.command }}
+                - "{{- . }}"
+                {{- end }}
+              envFrom:
+                - configMapRef:
+                    name: {{ template "repman.fullname" $ }}
+              securityContext:
+                runAsNonRoot: true
+                runAsUser: 1000
+              {{- if $.Values.filestorage.persistence.enabled }}
+              volumeMounts:
+                - mountPath: {{ $.Values.filestorage.path }}
+                  name: repman-data
+              {{ end }}
+          restartPolicy: OnFailure
+          volumes:
+            - name: repman-data
+            {{- if $.Values.filestorage.persistence.enabled }}
+            {{- if $.Values.filestorage.persistence.existingClaim }}
+              persistentVolumeClaim:
+                claimName: {{ $.Values.filestorage.persistence.existingClaim }}
+            {{- else }}
+              persistentVolumeClaim:
+                claimName: {{ template "repman.fullname" $ }}-data
+            {{- end }}
+            {{- else }}
+              emptyDir: {}
+            {{ end }}
+---
+{{ end }}

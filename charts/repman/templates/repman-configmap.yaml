@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ template "repman.fullname" . }}
+data:
+{{- toYaml .Values.config.repman | nindent 2 }}
+  MESSENGER_TRANSPORT_DSN: 'redis://{{ include "repman.redis.fullname" . }}:6379/messages'
+  MAILER_DSN: '{{ $.Values.mail.backend }}://{{ $.Values.mail.host }}:{{ $.Values.mail.port }}'
+  MAILER_SENDER: '{{ $.Values.mail.from }}'
+  APP_HOST: '{{ .Values.ingress.web.host }}'
+  DATABASE_URL: 'postgresql://{{ .Values.postgresql.postgresqlUsername }}:{{ .Values.postgresql.postgresqlPassword }}@{{ include "repman.postgresql.fullname" . }}:5432/{{ .Values.postgresql.postgresqlDatabase }}?serverVersion=11&charset=utf8'
