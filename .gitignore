@@ -1,3 +1,4 @@
 *-test.yaml
 out.yaml
 charts/*/charts/
+Chart.lock
