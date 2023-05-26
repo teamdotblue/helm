@@ -1,0 +1,60 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ template "repman.fullname" . }}-consumer
+  labels:
+    app: {{ template "repman.name" . }}-consumer
+spec:
+  replicas: {{ .Values.consumer.replicas }}
+  selector:
+    matchLabels:
+      app: {{ template "repman.name" . }}-consumer
+  template:
+    metadata:
+      annotations:
+        checksum/config: {{ include (print $.Template.BasePath "/repman-configmap.yaml") . | sha256sum }}
+        checksum/php: {{ include (print $.Template.BasePath "/php-ini-configmap.yaml") . | sha256sum }}
+      labels:
+        app: {{ template "repman.name" . }}-consumer
+    spec:
+      containers:
+        - name: consumer
+          image: "{{ .Values.images.buddy.repository }}:{{ .Values.images.buddy.tag }}"
+          imagePullPolicy: {{ .Values.images.buddy.pullPolicy }}
+          command: ["/bin/bash", "-c", "--"]
+          args:
+            - "/app/bin/console messenger:consume async --limit 500 -vv"
+          envFrom:
+            - configMapRef:
+                name: {{ template "repman.fullname" . }}
+          resources:
+            {{- .Values.web.resources | toYaml | nindent 12 }}
+          securityContext:
+            runAsUser: 82
+            runAsGroup: 82
+          volumeMounts:
+            - mountPath: {{ .Values.filestorage.path }}
+              name: repman-data
+            - name: {{ template "repman.fullname" . }}-php-ini
+              mountPath: /usr/local/etc/php/conf.d/chart.ini
+              subPath: chart.ini
+              readOnly: true
+      volumes:
+        - name: repman-data
+        {{- if .Values.filestorage.persistence.enabled }}
+        {{- if .Values.filestorage.persistence.existingClaim }}
+          persistentVolumeClaim:
+            claimName: {{ .Values.filestorage.persistence.existingClaim }}
+        {{- else }}
+          persistentVolumeClaim:
+            claimName: {{ template "repman.fullname" . }}-data
+        {{- end }}
+        {{- else }}
+          emptyDir: { }
+        {{ end }}
+        - name: {{ template "repman.fullname" . }}-php-ini
+          configMap:
+            name: {{ template "repman.fullname" . }}-php-ini
+            items:
+              - key: ini
+                path: chart.ini

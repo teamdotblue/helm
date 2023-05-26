@@ -1,0 +1,192 @@
+postgresql:
+  postgresqlDatabase: repman
+  postgresqlUsername: repman
+# Set a password through the values file
+#  postgresqlPassword: !ChangeM3!ChangeM3!ChangeM3!ChangeM3!
+  persistence:
+    enabled: true
+    size: 50Gi
+  resources:
+    limits: {}
+    requests:
+      memory: 3072Mi
+      cpu: 250m
+
+redis:
+# Set a password through the values file
+#  password: !ChangeM3!ChangeM3!ChangeM3!ChangeM3!
+
+images:
+  buddy:
+    repository: buddy/repman
+    # tag: ''
+    pullPolicy: Always # IfNotPresent
+
+  nginx:
+    repository: nginx
+    tag: stable
+    pullPolicy: Always
+
+nginx:
+  config:
+    # Change to the local ranges of your cluster
+    setRealIpFrom: '10.10.0.0/16'
+    realIpHeader: 'X-Forwarded-For'
+
+web:
+  replicas: 1
+  resources:
+    requests: {}
+#      memory: "512Mi"
+#      cpu: "512m"
+
+api:
+  replicas: 2
+  resources:
+    requests: {}
+#      memory: "512Mi"
+#      cpu: "500m"
+
+consumer:
+  replicas: 2
+  resources: {}
+
+mail:
+  backend: smtp
+  port: 25
+  host: "localhost"
+  from: "repman@localhost"
+
+ingress:
+  annotations: {}
+  web:
+    host: repman.example.com
+    secretName: cluster.default.cert
+  proxy:
+    host: repo.repman.example.com
+    secretName: cluster.default.cert
+  organization:
+    host: "*.repo.repman.example.com"
+    secretName: cluster.default.cert
+
+config:
+  repman:
+    # General Settings
+    APP_ENV: 'prod'
+    APP_DEBUG: '0'
+    APP_URL_SCHEME: 'https'
+#    APP_ALLOWED_PACKAGE_TYPES: 'gitlab,git'
+    APP_SECRET: 'bdDrUvkQjG3VYPMJeE9wrswEbuGbaq'
+    # Gitlab settings
+#    APP_GITLAB_API_URL: 'https://gitlab.com'
+#    OAUTH_GITLAB_CLIENT_ID: 'xxxxxxxxxxxxx'
+#    OAUTH_GITLAB_CLIENT_SECRET: 'yyyyyyyyyyyy'
+    TRUSTED_PROXIES: '127.0.0.1,REMOTE_ADDR'
+    # Storage backend
+    STORAGE_SOURCE: 'storage.s3'
+    STORAGE_AWS_OPAQUE_AUTH: 'true'
+    STORAGE_AWS_KEY: 'xxxxxxxxx'
+    STORAGE_AWS_SECRET: 'yyyyyyyyyyyyyy'
+    STORAGE_AWS_REGION: 'EU'
+    STORAGE_AWS_BUCKET: 'repman'
+    STORAGE_AWS_ENDPOINT: 'https://abcdefg.objectstore.eu'
+    STORAGE_AWS_PATH_STYLE_ENDPOINT: 'true'
+#    SENTRY_DSN: 'https://xxxxxxxyyyyyyyzzzzzzzzzz@sentry.io/1337'
+    SECURITY_ADVISORIES_DB_DIR: '%kernel.project_dir%/var/security-advisories'
+
+hooks:
+  enabled: true
+  removeOnSuccess: true
+  # Hook messenger-setup-transports set-up transports.
+  # Can be run on every upgrade, but is only needed on
+  # creation or when an update contains new queues.
+  messengerSetupTransports:
+    runVerbose: false
+  # Hook doctrine-migrations-migrate will run doctrine
+  # migrations. This will intitially set-up the DB but
+  # will also auto-update the DB after an update.
+  doctrineMigrationsMigrate:
+    runVerbose: false
+
+crons:
+  sync-release:
+    schedule: "*/5 * * * *" # At every 5th minute.
+    command:
+      - "/app/bin/console"
+      - "repman:proxy:sync-releases"
+  sync-metadata:
+    schedule: "*/6 * * * *" # At every 6th minute.
+    command:
+      - "/app/bin/console"
+      - "repman:proxy:sync-metadata"
+  send-telemetry:
+    schedule: "0 0 * * *" # At 00:00.
+    command:
+      - "/app/bin/console"
+      - "repman:telemetry:send"
+#  clear-old-dists:
+#    schedule: "0 1 * * *" # At 01:00.
+#    command:
+#      - "/app/bin/console"
+#      - "repman:package:clear-old-dists"
+#  update-security-db:
+#    schedule: "0 */2 * * *" # At minute 0 past every 2nd hour.
+#    command:
+#      - "/app/bin/console"
+#      - "repman:security:update-db"
+  update-all-packages:
+    schedule: "0 */6 * * *" # At minute 0 past every 6th hour.
+    command:
+      - "/app/bin/console"
+      - "repman:package:synchronize-all"
+
+## File storage options
+## Some files are needed on disk, and require a PVC.
+#
+filestorage:
+  path: /app/var/security-advisories
+
+  ## Enable persistence using Persistent Volume Claims
+  ## ref: http://kubernetes.io/docs/user-guide/persistent-volumes/
+  ##
+  persistence:
+    enabled: false
+
+    ## database data Persistent Volume Storage Class
+    ## If defined, storageClassName: <storageClass>
+    ## If set to "-", storageClassName: "", which disables dynamic provisioning
+    ## If undefined (the default) or set to null, no storageClassName spec is
+    ##   set, choosing the default provisioner.  (gp2 on AWS, standard on
+    ##   GKE, AWS & OpenStack)
+    ##
+    # storageClass: "-"
+    accessMode: ReadWriteMany
+    size: 5Gi
+
+    ## If existingClaim is specified, no PVC will be created and this claim will
+    ## be used
+    existingClaim: ""
+
+    ## If a volumeMode needs to be specified, uncomment the following line:
+    # volumeMode: Block
+
+php:
+  performanceMode:
+    enabled: false
+    settings:
+      opcache:
+        jit_buffer_size: 100M
+        preload: /app/config/preload.php
+        preload_user: www-data
+        memory_consumption: 1024
+        max_accelerated_files: 20000
+        validate_timestamps: 0
+        enable: yes
+      zend_extension: opcache
+      realpath_cache_sizeq: 4096K
+      realpath_cache_ttl: 600
+      error_log: /proc/self/fd/2
+      catch_workers_output: yes
+  config: |
+    # No additional config was added
+    # through values.yaml

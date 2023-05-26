@@ -1,0 +1,45 @@
+{{- if .Values.hooks.enabled -}}
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ template "repman.fullname" . }}-doctrine-migrations-migrate
+  labels:
+    app: repman
+    chart: "{{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}"
+    release: "{{ .Release.Name }}"
+    heritage: "{{ .Release.Service }}"
+  annotations:
+    # This is what defines this resource as a hook. Without this line, the
+    # job is considered part of the release.
+    "helm.sh/hook": "post-install,post-upgrade"
+    "helm.sh/hook-delete-policy": "{{ if .Values.hooks.removeOnSuccess }}hook-succeeded,{{ end }}before-hook-creation"
+    "helm.sh/hook-weight": "1"
+spec:
+  template:
+    metadata:
+      name: {{ template "repman.fullname" . }}-doctrine-migrations-migrate
+      annotations:
+        checksum/config: {{ include (print $.Template.BasePath "/repman-configmap.yaml") . | sha256sum }}
+      labels:
+        app: repman
+        release: "{{ .Release.Name }}"
+    spec:
+      restartPolicy: Never
+      containers:
+        - name: doctrine-migrations-migrate
+          image: "{{ .Values.images.buddy.repository }}:{{ .Values.images.buddy.tag }}"
+          imagePullPolicy: {{ .Values.images.buddy.pullPolicy }}
+          command:
+            - /app/bin/console
+            - d:m:m
+            - --no-interaction
+            {{ if .Values.hooks.doctrineMigrationsMigrate.runVerbose }}
+            - -vvv
+            {{ end }}
+          envFrom:
+            - configMapRef:
+                name: {{ template "repman.fullname" . }}
+          securityContext:
+            runAsUser: 82
+            runAsGroup: 82
+{{ end }}

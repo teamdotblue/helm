@@ -1,0 +1,26 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ template "repman.fullname" . }}-php-ini
+data:
+  ini: |
+    # This is the php.ini file for the {{ template "repman.fullname" . }}
+    # It is used to configure the PHP engine.
+    [PHP]
+    {{- if .Values.php.performanceMode.enabled }}
+    opcache.jit_buffer_size={{ .Values.php.performanceMode.settings.opcache.jit_buffer_size }}
+    zend_extension={{ .Values.php.performanceMode.settings.zend_extension }}
+
+    opcache.preload={{ .Values.php.performanceMode.settings.opcache.preload }}
+    opcache.preload_user={{ .Values.php.performanceMode.settings.opcache.preload_user }}
+    opcache.memory_consumption={{ .Values.php.performanceMode.settings.opcache.memory_consumption }}
+    opcache.max_accelerated_files={{ .Values.php.performanceMode.settings.opcache.max_accelerated_files }}
+    opcache.validate_timestamps={{ .Values.php.performanceMode.settings.opcache.validate_timestamps }}
+    realpath_cache_sizeq={{ .Values.php.performanceMode.settings.realpath_cache_sizeq }}
+    realpath_cache_ttl={{ .Values.php.performanceMode.settings.realpath_cache_ttl }}
+    error_log={{ .Values.php.performanceMode.settings.error_log }}
+    catch_workers_output={{ .Values.php.performanceMode.settings.catch_workers_output }}
+    opcache.enable={{ .Values.php.performanceMode.settings.opcache.enable }}
+    {{- end }}
+    {{- .Values.php.config | nindent 4 }}
+---
