@@ -59,15 +59,91 @@ mail:
 
 ingress:
   annotations: {}
-  web:
-    host: repman.example.com
-    secretName: cluster.default.cert
-  proxy:
-    host: repo.repman.example.com
-    secretName: cluster.default.cert
-  organization:
-    host: "*.repo.repman.example.com"
-    secretName: cluster.default.cert
+  hosts:
+    - name: web
+      host: repman.example.com
+      secretName: cluster.default.cert
+      paths:
+        # Base web path
+        - path: /
+          pathType: ImplementationSpecific
+          service: web
+        # Composer V1 api
+        - path: /p/
+          pathType: ImplementationSpecific
+          service: api
+        # Composer V2 api
+        - path: /p2/
+          pathType: ImplementationSpecific
+          service: api
+        # Dists endpoint
+        - path: /dists/
+          pathType: ImplementationSpecific
+          service: api
+        # Get all packages from repository
+        - path: /packages.json
+          pathType: ImplementationSpecific
+          service: api
+        # Report when packages are downloaded
+        - path: /downloads
+          pathType: ImplementationSpecific
+          service: api
+    - name: proxy
+      host: repo.repman.example.com
+      secretName: cluster.default.cert
+      paths:
+        # Base web path
+        - path: /
+          pathType: ImplementationSpecific
+          service: web
+        # Composer V1 api
+        - path: /p/
+          pathType: ImplementationSpecific
+          service: api
+        # Composer V2 api
+        - path: /p2/
+          pathType: ImplementationSpecific
+          service: api
+        # Dists endpoint
+        - path: /dists/
+          pathType: ImplementationSpecific
+          service: api
+        # Get all packages from repository
+        - path: /packages.json
+          pathType: ImplementationSpecific
+          service: api
+        # Report when packages are downloaded
+        - path: /downloads
+          pathType: ImplementationSpecific
+          service: api
+    - name: organization
+      host: "*.repo.repman.example.com"
+      secretName: cluster.default.cert
+      paths:
+        # Base web path
+        - path: /
+          pathType: ImplementationSpecific
+          service: web
+        # Composer V1 api
+        - path: /p/
+          pathType: ImplementationSpecific
+          service: api
+        # Composer V2 api
+        - path: /p2/
+          pathType: ImplementationSpecific
+          service: api
+        # Dists endpoint
+        - path: /dists/
+          pathType: ImplementationSpecific
+          service: api
+        # Get all packages from repository
+        - path: /packages.json
+          pathType: ImplementationSpecific
+          service: api
+        # Report when packages are downloaded
+        - path: /downloads
+          pathType: ImplementationSpecific
+          service: api
 
 config:
   repman:

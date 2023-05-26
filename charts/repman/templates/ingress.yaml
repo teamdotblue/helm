@@ -1,117 +1,60 @@
+{{- $fullName := include "repman.fullname" . -}}
+{{- $svcPort := .Values.nginx.servicePort -}}
+{{- if and .Values.ingress.className (not (semverCompare ">=1.18-0" .Capabilities.KubeVersion.GitVersion)) }}
+  {{- if not (hasKey .Values.ingress.annotations "kubernetes.io/ingress.class") }}
+  {{- $_ := set .Values.ingress.annotations "kubernetes.io/ingress.class" .Values.ingress.className}}
+  {{- end }}
+{{- end }}
+{{- if semverCompare ">=1.19-0" .Capabilities.KubeVersion.GitVersion -}}
+apiVersion: networking.k8s.io/v1
+{{- else if semverCompare ">=1.14-0" .Capabilities.KubeVersion.GitVersion -}}
 apiVersion: networking.k8s.io/v1beta1
+{{- else -}}
+apiVersion: extensions/v1beta1
+{{- end }}
 kind: Ingress
 metadata:
-  name: {{ template "repman.fullname" . }}
+  name: {{ $fullName }}
+  labels:
+    {{- include "repman.labels" . | nindent 4 }}
+  {{- with .Values.ingress.annotations }}
   annotations:
-    {{ toYaml .Values.ingress.annotations }}
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
 spec:
-  rules:
-    - host: {{ .Values.ingress.web.host }}
-      http:
-        paths:
-          # Base web path
-          - path: /
-            backend:
-              serviceName: {{ template "repman.fullname" . }}-web
-              servicePort: 8000
-          # Composer V1 api
-          - path: /p/
-            backend:
-              serviceName: {{ template "repman.fullname" . }}-api
-              servicePort: 8000
-          # Composer V2 api
-          - path: /p2/
-            backend:
-              serviceName: {{ template "repman.fullname" . }}-api
-              servicePort: 8000
-          # Dists endpoint
-          - path: /dists/
-            backend:
-              serviceName: {{ template "repman.fullname" . }}-api
-              servicePort: 8000
-          # Get all packages from repository
-          - path: /packages.json
-            backend:
-              serviceName: {{ template "repman.fullname" . }}-api
-              servicePort: 8000
-          # Report when packages are downloaded
-          - path: /downloads
-            backend:
-              serviceName: {{ template "repman.fullname" . }}-api
-              servicePort: 8000
-    - host: {{ .Values.ingress.proxy.host }}
-      http:
-        paths:
-          # Base web path
-          - path: /
-            backend:
-              serviceName: {{ template "repman.fullname" . }}-web
-              servicePort: 8000
-          # Composer V1 api
-          - path: /p/
-            backend:
-              serviceName: {{ template "repman.fullname" . }}-api
-              servicePort: 8000
-          # Composer V2 api
-          - path: /p2/
-            backend:
-              serviceName: {{ template "repman.fullname" . }}-api
-              servicePort: 8000
-          # Dists endpoint
-          - path: /dists/
-            backend:
-              serviceName: {{ template "repman.fullname" . }}-api
-              servicePort: 8000
-          # Get all packages from repository
-          - path: /packages.json
-            backend:
-              serviceName: {{ template "repman.fullname" . }}-api
-              servicePort: 8000
-          # Report when packages are downloaded
-          - path: /downloads
-            backend:
-              serviceName: {{ template "repman.fullname" . }}-api
-              servicePort: 8000
-    - host: "{{ .Values.ingress.organization.host }}"
-      http:
-        paths:
-          # Base web path
-          - path: /
-            backend:
-              serviceName: {{ template "repman.fullname" . }}-web
-              servicePort: 8000
-          # Composer V1 api
-          - path: /p/
-            backend:
-              serviceName: {{ template "repman.fullname" . }}-api
-              servicePort: 8000
-          # Composer V2 api
-          - path: /p2/
-            backend:
-              serviceName: {{ template "repman.fullname" . }}-api
-              servicePort: 8000
-          # Dists endpoint
-          - path: /dists/
-            backend:
-              serviceName: {{ template "repman.fullname" . }}-api
-              servicePort: 8000
-          # Get all packages from repository
-          - path: /packages.json
-            backend:
-              serviceName: {{ template "repman.fullname" . }}-api
-              servicePort: 8000
-          # Report when packages are downloaded
-          - path: /downloads
-            backend:
-              serviceName: {{ template "repman.fullname" . }}-api
-              servicePort: 8000
+  {{- if and .Values.ingress.className (semverCompare ">=1.18-0" .Capabilities.KubeVersion.GitVersion) }}
+  ingressClassName: {{ .Values.ingress.className }}
+  {{- end }}
+  {{- if .Values.ingress.tls }}
   tls:
+    {{- range .Values.ingress.tls }}
     - hosts:
-        - {{ .Values.ingress.web.host }}
-      secretName: {{ .Values.ingress.web.secretName }}
-    - hosts:
-        - {{ .Values.ingress.proxy.host }}
-      secretName: {{ .Values.ingress.proxy.secretName }}
-    - hosts:
-        - "{{ .Values.ingress.organization.host }}"
-      secretName: {{ .Values.ingress.organization.secretName }}
+        {{- range .hosts }}
+        - {{ . | quote }}
+        {{- end }}
+      secretName: {{ .secretName }}
+    {{- end }}
+  {{- end }}
+  rules:
+    {{- range .Values.ingress.hosts }}
+    - host: {{ .host | quote }}
+      http:
+        paths:
+          {{- range .paths }}
+          - path: {{ .path }}
+            {{- if and .pathType (semverCompare ">=1.18-0" $.Capabilities.KubeVersion.GitVersion) }}
+            pathType: {{ .pathType }}
+            {{- end }}
+            backend:
+              {{- if semverCompare ">=1.19-0" $.Capabilities.KubeVersion.GitVersion }}
+              service:
+                name: {{ .service }}
+                port:
+                  number: {{ $svcPort }}
+              {{- else }}
+              serviceName: {{ .service }}
+              servicePort: {{ $svcPort }}
+              {{- end }}
+          {{- end }}
+    {{- end }}
+
