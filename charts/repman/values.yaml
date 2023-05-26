@@ -1,8 +1,9 @@
 postgresql:
-  postgresqlDatabase: repman
-  postgresqlUsername: repman
-# Set a password through the values file
-#  postgresqlPassword: !ChangeM3!ChangeM3!ChangeM3!ChangeM3!
+  auth:
+    username: 'repman'
+    database: 'repman'
+    ## Uncomment to use a predefined password for postgresql
+    # password: ''
   persistence:
     enabled: true
     size: 50Gi
