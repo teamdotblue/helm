@@ -28,6 +28,7 @@ images:
     pullPolicy: Always
 
 nginx:
+  servicePort: 8000
   config:
     # Change to the local ranges of your cluster
     setRealIpFrom: '10.10.0.0/16'
