@@ -11,7 +11,7 @@ spec:
         spec:
           containers:
             - name: job
-              image: "{{ $.Values.images.buddy.repository }}:{{ $.Values.images.buddy.tag }}"
+              image: "{{ $.Values.images.buddy.repository }}:{{ default $.Chart.AppVersion $.Values.images.buddy.tag }}"
               imagePullPolicy: {{ $.Values.images.buddy.pullPolicy }}
               command:
                 {{- range $data.command }}

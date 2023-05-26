@@ -27,7 +27,7 @@ spec:
       restartPolicy: Never
       containers:
         - name: doctrine-migrations-migrate
-          image: "{{ .Values.images.buddy.repository }}:{{ .Values.images.buddy.tag }}"
+          image: "{{ .Values.images.buddy.repository }}:{{ default .Chart.AppVersion .Values.images.buddy.tag }}"
           imagePullPolicy: {{ .Values.images.buddy.pullPolicy }}
           command:
             - /app/bin/console
