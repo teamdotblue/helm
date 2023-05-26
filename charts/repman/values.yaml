@@ -12,7 +12,7 @@ postgresql:
       memory: 3072Mi
       cpu: 250m
 
-redis:
+redis: {}
 # Set a password through the values file
 #  password: !ChangeM3!ChangeM3!ChangeM3!ChangeM3!
 
