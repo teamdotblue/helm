@@ -3,7 +3,7 @@ kind: ConfigMap
 metadata:
   name: {{ template "repman.fullname" . }}-nginx
 data:
-  default:
+  default.conf:
     server {
       listen {{ .Values.nginx.servicePort }} default_server;
       listen [::]:{{ .Values.nginx.servicePort }} default_server;

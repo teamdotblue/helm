@@ -73,8 +73,8 @@ spec:
           configMap:
             name: {{ template "repman.fullname" . }}-nginx
             items:
-              - key: default
-                path: default
+              - key: default.conf
+                path: default.conf
         - name: repman-public
           emptyDir: {}
         - name: repman-data

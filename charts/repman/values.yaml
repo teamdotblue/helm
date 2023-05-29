@@ -33,7 +33,7 @@ images:
     pullPolicy: Always
 
 nginx:
-  servicePort: 8000
+  servicePort: 8080
   serviceType: ClusterIP
   config:
     # Change to the local ranges of your cluster
