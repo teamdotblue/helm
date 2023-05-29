@@ -66,10 +66,15 @@ mail:
 
 ingress:
   annotations: {}
+  tls: []
+#    - secretName: repman.example.com
+#      hosts:
+#        - repman.example.com
+#        - repo.repman.example.com
+#        - '*.repo.repman.example.com'
   hosts:
     - name: web
       host: repman.example.com
-      secretName: cluster.default.cert
       paths:
         # Base web path
         - path: /
@@ -97,7 +102,6 @@ ingress:
           service: api
     - name: proxy
       host: repo.repman.example.com
-      secretName: cluster.default.cert
       paths:
         # Base web path
         - path: /
@@ -125,7 +129,6 @@ ingress:
           service: api
     - name: organization
       host: "*.repo.repman.example.com"
-      secretName: cluster.default.cert
       paths:
         # Base web path
         - path: /
