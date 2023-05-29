@@ -20,6 +20,8 @@ spec:
               envFrom:
                 - configMapRef:
                     name: {{ template "repman.fullname" $ }}
+              env:
+                {{ include "repman.environmentSecrets" $ | nindent 16}}
               securityContext:
                 runAsNonRoot: true
                 runAsUser: 1000
