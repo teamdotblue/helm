@@ -31,3 +31,7 @@ dependencies:
   - name: redis
     version: 17.11.*
     repository: https://charts.bitnami.com/bitnami
+  - name: minio
+    version: 12.4.*
+    repository: https://charts.bitnami.com/bitnami
+    condition: minio.enabled

@@ -17,6 +17,10 @@ redis: {}
 # Set a password through the values file
 #  password: !ChangeM3!ChangeM3!ChangeM3!ChangeM3!
 
+minio:
+  enabled: true
+  defaultBuckets: 'repman'
+
 images:
   buddy:
     repository: buddy/repman
@@ -147,30 +151,36 @@ ingress:
           pathType: ImplementationSpecific
           service: api
 
-config:
-  repman:
-    # General Settings
-    APP_ENV: 'prod'
-    APP_DEBUG: '0'
-    APP_URL_SCHEME: 'https'
-#    APP_ALLOWED_PACKAGE_TYPES: 'gitlab,git'
-    APP_SECRET: 'bdDrUvkQjG3VYPMJeE9wrswEbuGbaq'
-    # Gitlab settings
-#    APP_GITLAB_API_URL: 'https://gitlab.com'
-#    OAUTH_GITLAB_CLIENT_ID: 'xxxxxxxxxxxxx'
-#    OAUTH_GITLAB_CLIENT_SECRET: 'yyyyyyyyyyyy'
-    TRUSTED_PROXIES: '127.0.0.1,REMOTE_ADDR'
-    # Storage backend
-    STORAGE_SOURCE: 'storage.s3'
-    STORAGE_AWS_OPAQUE_AUTH: 'true'
-    STORAGE_AWS_KEY: 'xxxxxxxxx'
-    STORAGE_AWS_SECRET: 'yyyyyyyyyyyyyy'
-    STORAGE_AWS_REGION: 'EU'
-    STORAGE_AWS_BUCKET: 'repman'
-    STORAGE_AWS_ENDPOINT: 'https://abcdefg.objectstore.eu'
-    STORAGE_AWS_PATH_STYLE_ENDPOINT: 'true'
-#    SENTRY_DSN: 'https://xxxxxxxyyyyyyyzzzzzzzzzz@sentry.io/1337'
-    SECURITY_ADVISORIES_DB_DIR: '%kernel.project_dir%/var/security-advisories'
+repman:
+  config:
+    ### Basic options
+    env: 'prod'
+    debug: '0'
+    url_scheme: 'https'
+    trusted_proxies: '127.0.0.1,REMOTE_ADDR'
+    security_advisories_db_dir: '%kernel.project_dir%/var/security-advisories'
+    # sentry_dsn: 'https://xxxxxxxyyyyyyyzzzzzzzzzz@sentry.io/1337'
+    # allowed_package_types: 'gitlab,git'
+    secret: 'c7dbd995176e079f857b6649b60ccf68'
+    ### GitLab configuration options
+    gitlab:
+      enabled: false
+      host: 'https://gitlab.com'
+      client_id: 'xxxxxxxxxxxxx'
+      client_secret: 'yyyyyyyyyyyy'
+### This not yet implemented.
+## Please configure through .Values.repman.rawEnv
+#    storage:
+#      source: 'storage.s3'
+#      s3:
+#        aws_opaque_auth: true
+#        key: 'xxxxx'
+#        secret: 'xxxx'
+#        region: 'eu'
+#        bucket: 'repman'
+#        endpoint: 'https://abcdefg.objectstore.eu'
+#        path_style_endpoint: true
+  rawEnv: {}
 
 hooks:
   enabled: true

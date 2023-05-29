@@ -3,9 +3,33 @@ kind: ConfigMap
 metadata:
   name: {{ template "repman.fullname" . }}
 data:
-{{- toYaml .Values.config.repman | nindent 2 }}
+{{- with .Values.repman.rawEnv }}
+{{- toYaml . | nindent 2 }}
+{{- end }}
   MESSENGER_TRANSPORT_DSN: 'redis://{{ include "repman.redis.fullname" . }}:6379/messages'
-  MAILER_DSN: '{{ $.Values.mail.backend }}://{{ $.Values.mail.host }}:{{ $.Values.mail.port }}'
-  MAILER_SENDER: '{{ $.Values.mail.from }}'
+  MAILER_DSN: '{{ .Values.mail.backend }}://{{ .Values.mail.host }}:{{ .Values.mail.port }}'
+  MAILER_SENDER: '{{ .Values.mail.from }}'
   APP_HOST: '{{ .Values.ingress.web.host }}'
   DATABASE_URL: 'postgresql://{{ .Values.postgresql.auth.username }}:{{ .Values.postgresql.auth.password }}@{{ include "repman.postgresql.fullname" . }}:5432/{{ .Values.postgresql.auth.database }}?serverVersion=11&charset=utf8'
+  {{- with .Values.repman.config }}
+  APP_ENV: {{ .env | quote }}
+  APP_DEBUG: {{ .debug | quote }}
+  APP_SECRET: {{ .secret | quote }}
+  APP_URL_SCHEME: {{ .url_scheme | quote }}
+  TRUSTED_PROXIES: {{ .trusted_proxies | quote }}
+  {{- with .allowed_package_types }}
+  APP_ALLOWED_PACKAGE_TYPES: {{ . | quote }}
+  {{- end }}
+  SECURITY_ADVISORIES_DB_DIR: {{ . | quote }}
+  {{- with .sentry_dsn }}
+  SENTRY_DSN: {{ . | quote }}
+  {{- end }}
+  {{- if .gitlab.enabled }}
+  APP_GITLAB_API_URL: {{ .gitlab.host | quote }}
+  OAUTH_GITLAB_CLIENT_ID: {{ .gitlab.client_id | quote }}
+  OAUTH_GITLAB_CLIENT_SECRET: {{ .gitlab.client_secret | quote }}
+  {{- end }}
+  {{- if not $.Values.minio.enabled }}
+    # TODO
+  {{- end }}
+  {{- end }}
