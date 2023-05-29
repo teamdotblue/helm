@@ -17,7 +17,7 @@ icon: https://avatars.githubusercontent.com/u/62094063
 # This is the chart version. This version number should be incremented each time you make changes
 # to the chart and its templates, including the app version.
 # Versions are expected to follow Semantic Versioning (https://semver.org/)
-version: 0.1.1
+version: 0.2.0
 
 # This is the version number of the application being deployed. This version number should be
 # incremented each time you make changes to the application. Versions are not expected to
@@ -35,3 +35,9 @@ dependencies:
     version: 12.4.*
     repository: https://charts.bitnami.com/bitnami
     condition: minio.enabled
+
+annotations:
+  # Supported kind: added, changed, deprecated, removed, fixed and security
+  artifacthub.io/changes: |
+    - kind: fixed
+      description: "The chart was able to fully run from this version up on our test cluster"
