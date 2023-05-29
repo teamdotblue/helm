@@ -28,12 +28,13 @@ images:
     pullPolicy: Always # IfNotPresent
 
   nginx:
-    repository: nginx
+    repository: nginxinc/nginx-unprivileged
     tag: stable
     pullPolicy: Always
 
 nginx:
   servicePort: 8000
+  serviceType: ClusterIP
   config:
     # Change to the local ranges of your cluster
     setRealIpFrom: '10.10.0.0/16'
@@ -157,6 +158,7 @@ repman:
     env: 'prod'
     debug: '0'
     url_scheme: 'https'
+    app_host: 'repman.example.com'
     trusted_proxies: '127.0.0.1,REMOTE_ADDR'
     security_advisories_db_dir: '%kernel.project_dir%/var/security-advisories'
     # sentry_dsn: 'https://xxxxxxxyyyyyyyzzzzzzzzzz@sentry.io/1337'

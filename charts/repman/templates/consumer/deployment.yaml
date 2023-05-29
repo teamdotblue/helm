@@ -8,14 +8,16 @@ spec:
   replicas: {{ .Values.consumer.replicas }}
   selector:
     matchLabels:
-      app: {{ template "repman.name" . }}-consumer
+      {{- include "repman.selectorLabels" . | nindent 6 }}
+      app.kubernetes.io/component: {{ template "repman.name" . }}-consumer
   template:
     metadata:
       annotations:
         checksum/config: {{ include (print $.Template.BasePath "/repman-configmap.yaml") . | sha256sum }}
         checksum/php: {{ include (print $.Template.BasePath "/php-ini-configmap.yaml") . | sha256sum }}
       labels:
-        app: {{ template "repman.name" . }}-consumer
+        {{- include "repman.selectorLabels" . | nindent 8 }}
+        app.kubernetes.io/component: {{ template "repman.name" . }}-consumer
     spec:
       containers:
         - name: consumer

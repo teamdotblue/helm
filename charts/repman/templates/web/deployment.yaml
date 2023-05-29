@@ -8,7 +8,8 @@ spec:
   replicas: {{ .Values.web.replicas }}
   selector:
     matchLabels:
-      app: {{ template "repman.name" . }}-web
+      {{- include "repman.selectorLabels" . | nindent 6 }}
+      app.kubernetes.io/component: {{ template "repman.name" . }}-web
   template:
     metadata:
       annotations:
@@ -16,7 +17,8 @@ spec:
         checksum/nginx: {{ include (print $.Template.BasePath "/nginx-configmap.yaml") . | sha256sum }}
         checksum/php: {{ include (print $.Template.BasePath "/php-ini-configmap.yaml") . | sha256sum }}
       labels:
-        app: {{ template "repman.name" . }}-web
+        {{- include "repman.selectorLabels" . | nindent 8 }}
+        app.kubernetes.io/component: {{ template "repman.name" . }}-web
     spec:
       containers:
         - name: fpm
@@ -51,7 +53,9 @@ spec:
           image: "{{ .Values.images.nginx.repository }}:{{ .Values.images.nginx.tag }}"
           imagePullPolicy: {{ .Values.images.nginx.pullPolicy }}
           ports:
-            - containerPort: 8000
+            - name: http
+              containerPort: {{ .Values.nginx.servicePort }}
+              protocol: TCP
           securityContext:
             runAsUser: 33
             runAsGroup: 33

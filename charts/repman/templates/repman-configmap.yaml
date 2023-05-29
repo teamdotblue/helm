@@ -9,9 +9,9 @@ data:
   MESSENGER_TRANSPORT_DSN: 'redis://{{ include "repman.redis.fullname" . }}:6379/messages'
   MAILER_DSN: '{{ .Values.mail.backend }}://{{ .Values.mail.host }}:{{ .Values.mail.port }}'
   MAILER_SENDER: '{{ .Values.mail.from }}'
-  APP_HOST: '{{ .Values.ingress.web.host }}'
   DATABASE_URL: 'postgresql://{{ .Values.postgresql.auth.username }}:{{ .Values.postgresql.auth.password }}@{{ include "repman.postgresql.fullname" . }}:5432/{{ .Values.postgresql.auth.database }}?serverVersion=11&charset=utf8'
   {{- with .Values.repman.config }}
+  APP_HOST: {{ .app_host | quote }}
   APP_ENV: {{ .env | quote }}
   APP_DEBUG: {{ .debug | quote }}
   APP_SECRET: {{ .secret | quote }}

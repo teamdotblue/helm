@@ -1,15 +1,16 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ template "repman.fullname" . }}-api
+  name: {{ include "repman.fullname" . }}-api
   labels:
-    app: {{ template "repman.name" . }}-api
+    {{- include "repman.labels" . | nindent 4 }}
 spec:
-  clusterIP: None
+  type: {{ .Values.nginx.serviceType }}
   ports:
-    - name: http
+    - port: {{ .Values.nginx.servicePort }}
+      targetPort: http
       protocol: TCP
-      port: 8000
-      targetPort: 8000
+      name: http
   selector:
-    app: {{ template "repman.name" . }}-api
+    {{- include "repman.selectorLabels" . | nindent 4 }}
+    app.kubernetes.io/component: {{ template "repman.name" . }}-api
