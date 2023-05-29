@@ -90,3 +90,20 @@ See more at https://kubernetes.io/docs/reference/using-api/deprecation-guide/#cr
     {{- print "batch/v1beta1" -}}
   {{- end -}}
 {{- end -}}
+
+{{/*
+Get env secrets.
+*/}}
+{{- define "repman.environmentSecrets" -}}
+# S3 Credentials
+- name: "STORAGE_AWS_KEY"
+  valueFrom:
+    secretKeyRef:
+      name: {{ template "repman.fullname" . }}-minio
+      key: root-user
+- name: "STORAGE_AWS_SECRET"
+  valueFrom:
+    secretKeyRef:
+      name: {{ template "repman.fullname" . }}-minio
+      key: root-password
+{{- end -}}

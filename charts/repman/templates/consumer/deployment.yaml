@@ -27,6 +27,8 @@ spec:
           envFrom:
             - configMapRef:
                 name: {{ template "repman.fullname" . }}
+          env:
+            {{ include "repman.environmentSecrets" . | nindent 12 }}
           resources:
             {{- .Values.web.resources | toYaml | nindent 12 }}
           securityContext:

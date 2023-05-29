@@ -32,4 +32,12 @@ data:
   {{- if not $.Values.minio.enabled }}
     # TODO
   {{- end }}
+  {{- if $.Values.minio.enabled }}
+  STORAGE_SOURCE: 'storage.s3'
+  STORAGE_AWS_OPAQUE_AUTH: 'true'
+  STORAGE_AWS_REGION: 'EU'
+  STORAGE_AWS_BUCKET: 'repman'
+  STORAGE_AWS_ENDPOINT: 'http://{{ template "repman.fullname" $ }}-minio:9000'
+  STORAGE_AWS_PATH_STYLE_ENDPOINT: 'true'
+  {{- end }}
   {{- end }}
