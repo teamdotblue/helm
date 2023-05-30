@@ -3,6 +3,38 @@ entries:
   repman:
   - annotations:
       artifacthub.io/changes: |-
+        - kind: added
+          description: "Introduce podSecurityContext"
+        - kind: added
+          description: "Implement additional pod contexts"
+        - kind: added
+          description: "License (Apache License 2.0)"
+        - kind: changed
+          description: "Added a more descriptive README"
+    apiVersion: v2
+    appVersion: 1.4.0
+    created: "2023-05-30T12:38:16.162298353Z"
+    dependencies:
+    - name: postgresql
+      repository: https://charts.bitnami.com/bitnami
+      version: 12.5.*
+    - name: redis
+      repository: https://charts.bitnami.com/bitnami
+      version: 17.11.*
+    - condition: minio.enabled
+      name: minio
+      repository: https://charts.bitnami.com/bitnami
+      version: 12.4.*
+    description: A Helm chart for Kubernetes
+    digest: c4cb97db0e49fa50ad4d1045f579be3faf3279f410a710e1b6d5f6f8158ecf67
+    icon: https://avatars.githubusercontent.com/u/62094063
+    name: repman
+    type: application
+    urls:
+    - https://github.com/teamdotblue/helm/releases/download/repman-0.2.1/repman-0.2.1.tgz
+    version: 0.2.1
+  - annotations:
+      artifacthub.io/changes: |-
         - kind: fixed
           description: "The chart was able to fully run from this version up on our test cluster"
     apiVersion: v2
@@ -27,4 +59,4 @@ entries:
     urls:
     - https://github.com/teamdotblue/helm/releases/download/repman-0.2.0/repman-0.2.0.tgz
     version: 0.2.0
-generated: "2023-05-29T20:18:39.345848651Z"
+generated: "2023-05-30T12:38:16.162313154Z"
