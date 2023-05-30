@@ -1,6 +1,6 @@
 apiVersion: v2
 name: repman
-description: A Helm chart for Kubernetes
+description: Repman is a PHP repository manager and Packagist proxy.
 
 # A chart can be either an 'application' or a 'library' chart.
 #
