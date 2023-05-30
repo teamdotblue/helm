@@ -283,3 +283,5 @@ php:
   config: |
     # No additional config was added
     # through values.yaml
+
+podAnnotations: {}

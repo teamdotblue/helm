@@ -15,6 +15,9 @@ spec:
       annotations:
         checksum/config: {{ include (print $.Template.BasePath "/repman-configmap.yaml") . | sha256sum }}
         checksum/php: {{ include (print $.Template.BasePath "/php-ini-configmap.yaml") . | sha256sum }}
+        {{- if .Values.podAnnotations }}
+        {{ toYaml .Values.podAnnotations | nindent 8 }}
+        {{- end }}
       labels:
         {{- include "repman.selectorLabels" . | nindent 8 }}
         app.kubernetes.io/component: {{ template "repman.name" . }}-consumer
