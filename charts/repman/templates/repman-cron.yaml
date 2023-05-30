@@ -28,8 +28,7 @@ spec:
               env:
                 {{ include "repman.environmentSecrets" $ | nindent 16}}
               securityContext:
-                runAsNonRoot: true
-                runAsUser: 1000
+                {{- toYaml $.Values.podSecurityContext | nindent 16 }}
               {{- if $.Values.filestorage.persistence.enabled }}
               volumeMounts:
                 - mountPath: {{ $.Values.filestorage.path }}

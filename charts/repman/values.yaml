@@ -285,3 +285,11 @@ php:
     # through values.yaml
 
 podAnnotations: {}
+
+podSecurityContext: {}
+  # capabilities:
+  #   drop:
+  #   - ALL
+  # readOnlyRootFilesystem: true
+# runAsNonRoot: true
+# runAsUser: 1000

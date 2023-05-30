@@ -37,8 +37,7 @@ spec:
           resources:
             {{- .Values.web.resources | toYaml | nindent 12 }}
           securityContext:
-            runAsUser: 82
-            runAsGroup: 82
+            {{- toYaml .Values.podSecurityContext | nindent 12 }}
           volumeMounts:
             - mountPath: {{ .Values.filestorage.path }}
               name: repman-data

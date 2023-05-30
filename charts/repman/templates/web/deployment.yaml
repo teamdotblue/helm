@@ -36,8 +36,7 @@ spec:
           env:
             {{ include "repman.environmentSecrets" . | nindent 12 }}
           securityContext:
-            runAsUser: 82
-            runAsGroup: 82
+            {{- toYaml .Values.podSecurityContext | nindent 12 }}
           resources:
             {{- .Values.web.resources | toYaml | nindent 12 }}
           volumeMounts:
@@ -60,8 +59,7 @@ spec:
               containerPort: {{ .Values.nginx.servicePort }}
               protocol: TCP
           securityContext:
-            runAsUser: 33
-            runAsGroup: 33
+            {{- toYaml .Values.podSecurityContext | nindent 12 }}
           volumeMounts:
             - name: nginx-config
               mountPath: /etc/nginx/conf.d/

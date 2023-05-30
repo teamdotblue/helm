@@ -45,6 +45,5 @@ spec:
           env:
             {{ include "repman.environmentSecrets" . | nindent 12 }}
           securityContext:
-            runAsUser: 82
-            runAsGroup: 82
+            {{- toYaml .Values.podSecurityContext | nindent 12 }}
 {{ end }}
