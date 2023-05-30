@@ -13,11 +13,16 @@ to see the charts.
 
 To install the <chart-name> chart:
 
-    helm install my-<chart-name> teamdotblue/<chart-name>
+```console
+helm install my-<chart-name> teamdotblue/<chart-name>
+```
 
 To uninstall the chart:
 
-    helm delete my-<chart-name>
+```console
+helm delete my-<chart-name>
+```
 
 ## Charts available
+
 - [Repman](https://github.com/repman-io/repman) - [Chart source available](https://github.com/teamdotblue/helm/tree/main/charts/repman)
