@@ -3,6 +3,36 @@ entries:
   repman:
   - annotations:
       artifacthub.io/changes: |-
+        - kind: fixed
+          description: "Wrong inclusion of environment variable"
+        - kind: fixed
+          description: "Wrong definition of the API deployment"
+        - kind: added
+          description: "Descriptive chart description"
+    apiVersion: v2
+    appVersion: 1.4.0
+    created: "2023-06-01T12:44:35.331425845Z"
+    dependencies:
+    - name: postgresql
+      repository: https://charts.bitnami.com/bitnami
+      version: 12.5.*
+    - name: redis
+      repository: https://charts.bitnami.com/bitnami
+      version: 17.11.*
+    - condition: minio.enabled
+      name: minio
+      repository: https://charts.bitnami.com/bitnami
+      version: 12.4.*
+    description: Repman is a PHP repository manager and Packagist proxy.
+    digest: 2d1d85ca6d099d127fa6f183eebb0c6a1962d701ebf16ba6ca8748218a854d4d
+    icon: https://avatars.githubusercontent.com/u/62094063
+    name: repman
+    type: application
+    urls:
+    - https://github.com/teamdotblue/helm/releases/download/repman-0.3.0/repman-0.3.0.tgz
+    version: 0.3.0
+  - annotations:
+      artifacthub.io/changes: |-
         - kind: added
           description: "Introduce podSecurityContext"
         - kind: added
@@ -59,4 +89,4 @@ entries:
     urls:
     - https://github.com/teamdotblue/helm/releases/download/repman-0.2.0/repman-0.2.0.tgz
     version: 0.2.0
-generated: "2023-05-30T12:38:16.162313154Z"
+generated: "2023-06-01T12:44:35.331443445Z"
