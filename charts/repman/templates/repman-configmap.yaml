@@ -20,7 +20,9 @@ data:
   {{- with .allowed_package_types }}
   APP_ALLOWED_PACKAGE_TYPES: {{ . | quote }}
   {{- end }}
+  {{- with .security_advisories_db_dir }}
   SECURITY_ADVISORIES_DB_DIR: {{ . | quote }}
+  {{- end }}
   {{- with .sentry_dsn }}
   SENTRY_DSN: {{ . | quote }}
   {{- end }}

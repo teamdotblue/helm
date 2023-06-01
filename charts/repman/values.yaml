@@ -4,9 +4,9 @@ postgresql:
     database: 'repman'
     ## Uncomment to use a predefined password for postgresql
     # password: ''
-  persistence:
-    enabled: true
-    size: 50Gi
+  primary:
+    persistence:
+      size: 8Gi
   resources:
     limits: {}
     requests:
@@ -287,9 +287,9 @@ php:
 podAnnotations: {}
 
 podSecurityContext: {}
-  # capabilities:
-  #   drop:
-  #   - ALL
-  # readOnlyRootFilesystem: true
-# runAsNonRoot: true
-# runAsUser: 1000
+#  capabilities:
+#    drop:
+#    - ALL
+#  readOnlyRootFilesystem: true
+#  runAsNonRoot: true
+#  runAsUser: 1000
