@@ -17,7 +17,7 @@ icon: https://avatars.githubusercontent.com/u/62094063
 # This is the chart version. This version number should be incremented each time you make changes
 # to the chart and its templates, including the app version.
 # Versions are expected to follow Semantic Versioning (https://semver.org/)
-version: 0.2.1
+version: 0.3.0
 
 # This is the version number of the application being deployed. This version number should be
 # incremented each time you make changes to the application. Versions are not expected to
@@ -39,11 +39,9 @@ dependencies:
 annotations:
   # Supported kind: added, changed, deprecated, removed, fixed and security
   artifacthub.io/changes: |
+    - kind: fixed
+      description: "Wrong inclusion of environment variable"
+    - kind: fixed
+      description: "Wrong definition of the API deployment"
     - kind: added
-      description: "Introduce podSecurityContext"
-    - kind: added
-      description: "Implement additional pod contexts"
-    - kind: added
-      description: "License (Apache License 2.0)"
-    - kind: changed
-      description: "Added a more descriptive README"
+      description: "Descriptive chart description"
