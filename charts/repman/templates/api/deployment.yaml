@@ -29,7 +29,7 @@ spec:
           imagePullPolicy: {{ .Values.images.buddy.pullPolicy }}
           command: ["/bin/bash", "-c", "--"]
           args:
-            - "cp -r /app/public/* /app/public-shared/ && /app/bin/console d:m:m --no-interaction && /app/bin/console messenger:setup-transports --no-interaction && /app/bin/console assets:install && php-fpm"
+            - "cp -r /app/public/* /app/public-shared/ && /app/bin/console assets:install && php-fpm"
           envFrom:
             - configMapRef:
                 name: {{ template "repman.fullname" . }}
@@ -42,11 +42,12 @@ spec:
           volumeMounts:
             - mountPath: /app/public-shared
               name: repman-public
-          {{- if .Values.filestorage.persistence.enabled }}
+            - name: instance-id
+              subPath: instance-id
+              mountPath: /app/var/instance-id
             - mountPath: {{ .Values.filestorage.path }}
               name: repman-data
-          {{ end }}
-            - name: {{ template "repman.fullname" . }}-php-ini
+            - name: {{  template "repman.fullname" . }}-php-ini
               mountPath: /usr/local/etc/php/conf.d/chart.ini
               subPath: chart.ini
               readOnly: true
@@ -61,14 +62,14 @@ spec:
             {{- toYaml .Values.podSecurityContext | nindent 12 }}
           volumeMounts:
             - name: nginx-config
-              mountPath: /etc/nginx/sites-available
+              mountPath: /etc/nginx/conf.d/
               readOnly: true
             - mountPath: /app/public
               name: repman-public
           resources:
             requests:
               memory: "256Mi"
-              cpu: "100m"
+              cpu: "500m"
       volumes:
         - name: nginx-config
           configMap:
@@ -76,6 +77,12 @@ spec:
             items:
               - key: default.conf
                 path: default.conf
+        - name: instance-id
+          configMap:
+            name: {{ template "repman.fullname" . }}-instance-id
+            items:
+              - key: instance-id
+                path: instance-id
         - name: repman-public
           emptyDir: {}
         - name: repman-data

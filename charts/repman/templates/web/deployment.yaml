@@ -97,9 +97,9 @@ spec:
         {{- else }}
           emptyDir: { }
         {{ end }}
-        - name: {{  template "repman.fullname" . }}-php-ini
+        - name: {{ template "repman.fullname" . }}-php-ini
           configMap:
-            name: {{  template "repman.fullname" . }}-php-ini
+            name: {{ template "repman.fullname" . }}-php-ini
             items:
               - key: ini
                 path: chart.ini
